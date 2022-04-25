@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 
-@Entity
+@Entity(tableName = "todo_table")
 data class TodoItem(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
