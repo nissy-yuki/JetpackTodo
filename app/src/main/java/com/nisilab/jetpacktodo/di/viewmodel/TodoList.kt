@@ -12,4 +12,10 @@ data class TodoList(
         }
         return next
     }
+
+    fun changeFinishFlg(item: TodoItem): TodoList{
+        var next = this.list
+        next!!.find{it.id == item.id}!!.changeFinishFlg()
+        return TodoList(next)
+    }
 }
