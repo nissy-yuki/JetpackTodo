@@ -11,7 +11,11 @@ data class TodoItem(
     var title: String,
     var deadLine: LocalDateTime,
     var tag: String,
-    var text: String
+    var text: String,
+    var isFinish: Boolean = false
 
 ) {
+    fun changeFinishFlg(): TodoItem{
+        return this.copy(isFinish = !this.isFinish)
+    }
 }
