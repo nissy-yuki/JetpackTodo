@@ -5,7 +5,7 @@ import com.nisilab.jetpacktodo.di.database.TodoItem
 import javax.inject.Inject
 
 class DataRepositoryImpl @Inject constructor(private val Dao: TodoDao) : DataRepository {
-    override suspend fun loadItems() = Dao.loadAllItem()
+    override fun loadItems() = Dao.loadAllItem()
 
     override suspend fun addItem(item: TodoItem) = Dao.addItem(item)
 
