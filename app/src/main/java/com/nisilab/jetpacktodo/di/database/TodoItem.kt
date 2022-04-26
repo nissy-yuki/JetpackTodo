@@ -21,6 +21,6 @@ data class TodoItem(
     }
 
     fun toOutItem(): OutItem{
-        return OutItem(id = this.id, title = this.title, deadLine = this.deadLine, tag = this.tag, text = this.text, isFinish = this.isFinish)
+        return OutItem(this)
     }
 }

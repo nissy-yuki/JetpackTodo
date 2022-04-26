@@ -1,14 +1,10 @@
 package com.nisilab.jetpacktodo.di.viewmodel
 
+import com.nisilab.jetpacktodo.di.database.TodoItem
 import java.time.LocalDateTime
 
 data class OutItem(
-    val id: Int,
-    var title: String,
-    var deadLine: LocalDateTime,
-    var tag: String,
-    var text: String,
-    var isFinish: Boolean,
+    val todo: TodoItem,
     var isOpen: Boolean = false
 ){
     fun changeOpenFlg(){
@@ -16,6 +12,6 @@ data class OutItem(
     }
 
     fun changeFinishFlg(){
-        this.isFinish = !this.isFinish
+        this.todo.isFinish = !this.todo.isFinish
     }
 }

@@ -3,14 +3,14 @@ package com.nisilab.jetpacktodo.di.viewmodel
 data class OutList(
     val list: List<OutItem> = emptyList()
 ) {
-    fun changeOpenFlg(item: OutItem): OutList{
+    fun changeOpenFlg(itemId: Int): OutList{
         val next = this.list
-        next.find{ it.id == item.id }!!.changeOpenFlg()
+        next.find{ it.todo.id == itemId }!!.changeOpenFlg()
         return OutList(next)
     }
-    fun changeFinishFlg(item: OutItem): OutList{
+    fun changeFinishFlg(itemId: Int): OutList{
         val next = this.list
-        next.find{ it.id == item.id }!!.changeFinishFlg()
+        next.find{ it.todo.id == itemId }!!.changeFinishFlg()
         return OutList(next)
     }
 }

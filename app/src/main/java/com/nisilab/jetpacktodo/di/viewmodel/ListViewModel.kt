@@ -20,16 +20,16 @@ class ListViewModel @Inject constructor(private val repository: DataRepository) 
     val outAllItems: StateFlow<OutList> = _outAllItems
     val outItems: StateFlow<OutList> = _outItems
 
-    fun updateTodo(item: TodoItem){
-        _todoItems.value = _todoItems.value.changeFinishFlg(item)
+    fun updateTodo(itemId: Int){
+        _todoItems.value = _todoItems.value.changeFinishFlg(itemId)
     }
 
-    fun updateAllOut(item: OutItem){
-        _outAllItems.value = _outAllItems.value.changeOpenFlg(item)
+    fun updateAllOut(itemId: Int){
+        _outAllItems.value = _outAllItems.value.changeOpenFlg(itemId)
     }
 
-    fun updateOut(item: OutItem){
-        _outAllItems.value = _outAllItems.value.changeOpenFlg(item)
+    fun updateOut(itemId: Int){
+        _outAllItems.value = _outAllItems.value.changeOpenFlg(itemId)
     }
 
 }

@@ -13,9 +13,9 @@ data class TodoList(
         return next
     }
 
-    fun changeFinishFlg(item: TodoItem): TodoList{
+    fun changeFinishFlg(itemId: Int): TodoList{
         var next = this.list
-        next!!.find{it.id == item.id}!!.changeFinishFlg()
+        next!!.find{it.id == itemId}!!.changeFinishFlg()
         return TodoList(next)
     }
 }
