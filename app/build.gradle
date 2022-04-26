@@ -57,6 +57,7 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
     implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
@@ -72,7 +73,7 @@ dependencies {
     // for Hilt
     def hilt_version = "2.41"
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-android-compiler:2$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     // for navigation
     def nav_version = "2.4.2"
@@ -81,5 +82,5 @@ dependencies {
     // for coroutine
     def cor_version = "1.3.9"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$cor_version"
-    
+
 }

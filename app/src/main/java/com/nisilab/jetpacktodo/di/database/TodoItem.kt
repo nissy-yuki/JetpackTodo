@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @Entity(tableName = "todo_table")
 data class TodoItem(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Int = 0,
     var title: String,
     var deadLine: LocalDateTime,
     var tag: String,

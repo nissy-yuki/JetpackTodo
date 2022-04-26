@@ -6,11 +6,15 @@ data class TodoList(
     val list: List<TodoItem>? = emptyList()
 ){
     fun toOutItems(): List<OutItem>{
-        var next = mutableListOf<OutItem>()
-        this.list!!.forEach {
-            next.add(it.toOutItem())
+        return if(this.list.isNullOrEmpty()){
+            emptyList()
+        } else {
+            var next = mutableListOf<OutItem>()
+            this.list!!.forEach {
+                next.add(it.toOutItem())
+            }
+            next
         }
-        return next
     }
 
     fun changeFinishFlg(itemId: Int): TodoList{
