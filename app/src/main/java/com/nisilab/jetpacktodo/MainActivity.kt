@@ -28,13 +28,22 @@ class MainActivity : ComponentActivity() {
             JetpackTodoTheme {
                 // A surface container using the 'background' color from the theme
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = "list"){
-                    composable("list"){ listScreen(viewModel = listViewModel){navController.navigate("edit") } }
-                    composable("edit"){ EditScreen(viewModel = editViewModel,navController = navController){ navController.navigate("list"){
-                        popUpTo("edit") { inclusive = true }
-                    } } }
+                NavHost(navController = navController, startDestination = "list") {
+                    composable("list") {
+                        listScreen(viewModel = listViewModel) {
+                            navController.navigate(
+                                "edit"
+                            )
+                        }
+                    }
+                    composable("edit") {
+                        EditScreen(viewModel = editViewModel, navController = navController) {
+                            navController.navigate("list") {
+                                popUpTo("list") { inclusive = true }
+                            }
+                        }
+                    }
                 }
-//                Greeting(name = "hoge")
             }
         }
     }
