@@ -1,13 +1,10 @@
 package com.nisilab.jetpacktodo
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import android.util.Log
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -19,21 +16,27 @@ import androidx.compose.ui.unit.dp
 import com.nisilab.jetpacktodo.di.viewmodel.ListViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nisilab.jetpacktodo.di.viewmodel.OutItem
-import com.nisilab.jetpacktodo.di.viewmodel.OutList
 
 @Composable
 fun listScreen(viewModel: ListViewModel = viewModel(),toEdit: () -> Unit){
     viewModel.setItems()
     val items by viewModel.outItems.collectAsState()
-
-    items?.let { ListCompose(it) }
-    editButton { toEdit }
+    Surface(modifier = Modifier.fillMaxSize()) {
+        items?.getOutList()?.also{
+            Log.d("checkMove","have data")
+            ListCompose(it)
+        } ?: run {
+            Log.d("checkMove","no data")
+            noDataText()
+        }
+        editButton { toEdit() }
+    }
 }
 
 @Composable
-fun ListCompose(outItems: OutList) {
+fun ListCompose(outItems: List<OutItem>) {
     LazyColumn(modifier = Modifier.fillMaxSize()){
-        items(outItems.list){ toDo ->
+        items(outItems){ toDo ->
             listItem(toDo = toDo)
         }
     }
@@ -54,5 +57,14 @@ fun editButton(action: () -> Unit){
         FloatingActionButton(modifier = Modifier.padding(32.dp), onClick = { action() }) {
             Icon(Icons.Filled.Add, contentDescription = "add")
         }
+    }
+}
+
+@Composable
+fun noDataText(){
+    Column(modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,) {
+        Text(modifier = Modifier,text = "no data")
     }
 }
