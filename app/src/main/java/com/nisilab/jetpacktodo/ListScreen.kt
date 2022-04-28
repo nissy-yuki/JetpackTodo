@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nisilab.jetpacktodo.di.database.TodoItem
 import com.nisilab.jetpacktodo.di.viewmodel.OutItem
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 @Composable
@@ -78,7 +79,7 @@ fun itemHeadContents(item: OutItem){
         .fillMaxWidth()
         .padding(8.dp)) {
         checkButton(checkFlg = item.todo.isFinish, action = { item.changeFinishFlg() })
-        headTextSet(title = item.todo.title, deadLine = item.todo.deadLine.toString())
+        headTextSet(title = item.todo.title, deadLine = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(item.todo.deadLine))
         arrowButton(isOpen = item.isOpen, action = { item.changeOpenFlg() })
     }
 }
