@@ -1,5 +1,6 @@
 package com.nisilab.jetpacktodo.di.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nisilab.jetpacktodo.di.repository.DataRepository
@@ -21,13 +22,12 @@ class ListViewModel @Inject constructor( private val repository: DataRepository)
     val outItems: StateFlow<OutList?> = _outItems
 
     fun setItems(){
+        Log.d("checkMove","set item")
         viewModelScope.launch {
             val items = repository.loadItems()
-            items?.let{
-                _todoItems.value = TodoList(it)
-                _outAllItems.value = OutList(_todoItems.value.toOutItems())
-                _outItems.value = _outAllItems.value
-            }
+            _todoItems.value = TodoList(items)
+            _outAllItems.value = OutList(_todoItems.value.toOutItems())
+            _outItems.value = _outAllItems.value
         }
     }
 

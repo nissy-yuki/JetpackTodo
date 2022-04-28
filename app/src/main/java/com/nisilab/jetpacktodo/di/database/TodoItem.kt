@@ -3,6 +3,7 @@ package com.nisilab.jetpacktodo.di.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.nisilab.jetpacktodo.di.viewmodel.OutItem
+import java.io.Serializable
 import java.time.LocalDateTime
 
 @Entity(tableName = "todo_table")
@@ -15,7 +16,7 @@ data class TodoItem(
     var text: String,
     var isFinish: Boolean = false
 
-) {
+):Serializable {
     fun changeFinishFlg(): TodoItem{
         return this.copy(isFinish = !this.isFinish)
     }
