@@ -12,8 +12,8 @@ data class TodoItem(
     val id: Int = 0,
     var title: String,
     var deadLine: LocalDateTime,
-    var tag: String,
-    var text: String,
+    var tag: String?,
+    var text: String?,
     var isFinish: Boolean = false
 
 ):Serializable {
