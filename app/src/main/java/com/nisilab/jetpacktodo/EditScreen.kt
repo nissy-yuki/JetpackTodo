@@ -1,5 +1,6 @@
 package com.nisilab.jetpacktodo
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,13 +31,27 @@ fun EditScreen(
     toList: () -> Unit
 ) {
     val title by viewModel.editTitle.collectAsState()
+    val deadLine by viewModel.editDateTime.collectAsState()
     val tag by viewModel.editTag.collectAsState()
     val text by viewModel.editText.collectAsState()
     val focusManager = LocalFocusManager.current
-    Surface(modifier = Modifier.fillMaxSize().clickable(
-        interactionSource = MutableInteractionSource(),
-        indication = null,
-    ) { focusManager.clearFocus() }) {
+
+
+
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .clickable(
+            interactionSource = MutableInteractionSource(),
+            indication = null,
+        ) { focusManager.clearFocus() }) {
+
+        val snackState = remember { SnackbarHostState() }
+        val snackScope = rememberCoroutineScope()
+
+        SnackbarHost(hostState = snackState, Modifier)
+        fun launchSnackBar() {
+            snackScope.launch { snackState.showSnackbar("タイトルを入力してください") }
+        }
         Column(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -48,9 +63,7 @@ fun EditScreen(
                 backButton {
                     toList()
                 }
-                saveButton {
-                    toList()
-                }
+                saveButton(saveFlg = !title.isNullOrBlank(), toList = toList, saveAction = viewModel::saveTodo, showSnack = ::launchSnackBar)
             }
         }
     }
@@ -89,8 +102,17 @@ fun backButton(action: () -> Unit) {
 }
 
 @Composable
-fun saveButton(action: () -> Unit) {
-    Button(onClick = { action() }) {
+fun saveButton(saveFlg: Boolean,toList: () -> Unit,saveAction:() -> Unit,showSnack: () -> Unit) {
+    Button(onClick = {
+        if (saveFlg){
+            saveAction()
+            toList()
+        } else {
+            showSnack()
+        }
+    }) {
         Text(text = "save")
     }
 }
+
+@

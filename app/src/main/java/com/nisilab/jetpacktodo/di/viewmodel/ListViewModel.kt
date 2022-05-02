@@ -22,7 +22,6 @@ class ListViewModel @Inject constructor( private val repository: DataRepository)
     val outItems: StateFlow<OutList?> = _outItems
 
     fun setItems(){
-        Log.d("checkMove","set item")
         viewModelScope.launch {
             val items = repository.loadItems()
             _todoItems.value = TodoList(items)

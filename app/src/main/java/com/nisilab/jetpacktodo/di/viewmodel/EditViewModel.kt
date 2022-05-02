@@ -3,10 +3,13 @@ package com.nisilab.jetpacktodo.di.viewmodel
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.nisilab.jetpacktodo.di.database.TodoItem
 import com.nisilab.jetpacktodo.di.repository.DataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZonedDateTime
@@ -39,5 +42,18 @@ class EditViewModel @Inject constructor(private val repository: DataRepository) 
 
     fun setText(value: String){
         _editText.value = value
+    }
+
+    fun saveTodo(){
+        viewModelScope.launch {
+            repository.addItem(
+                TodoItem(
+                    title = _editTitle.value,
+                    deadLine = _editDateTime.value.toLocalDateTime(),
+                    tag = _editTag.value,
+                    text = _editText.value
+                )
+            )
+        }
     }
 }
