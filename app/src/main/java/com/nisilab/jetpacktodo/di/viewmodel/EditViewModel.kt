@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
@@ -19,12 +20,14 @@ import javax.inject.Inject
 @HiltViewModel
 class EditViewModel @Inject constructor(private val repository: DataRepository) : ViewModel() {
     private val _editTitle: MutableStateFlow<String> = MutableStateFlow("")
-    private val _editDateTime: MutableStateFlow<ZonedDateTime> = MutableStateFlow(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS))
+    private val _editDate: MutableStateFlow<LocalDate> = MutableStateFlow((ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).toLocalDate())
+    private val _editTime: MutableStateFlow<LocalTime> = MutableStateFlow((ZonedDateTime.now()).truncatedTo(ChronoUnit.MINUTES).toLocalTime())
     private val _editTag: MutableStateFlow<String> = MutableStateFlow("")
     private val _editText: MutableStateFlow<String> = MutableStateFlow("")
 
     val editTitle: StateFlow<String> = _editTitle
-    val editDateTime: StateFlow<ZonedDateTime> = _editDateTime
+    val editDate: StateFlow<LocalDate> = _editDate
+    val editTime: StateFlow<LocalTime> = _editTime
     val editTag: StateFlow<String> = _editTag
     val editText: StateFlow<String> = _editText
 
@@ -32,8 +35,12 @@ class EditViewModel @Inject constructor(private val repository: DataRepository) 
         _editTitle.value = value
     }
 
-    fun setDateTime(value: ZonedDateTime){
-        _editDateTime.value = value
+    fun setDate(value: LocalDate){
+        _editDate.value = value
+    }
+
+    fun setTime(value: LocalTime){
+        _editTime.value = value
     }
 
     fun setTag(value: String){
@@ -49,7 +56,7 @@ class EditViewModel @Inject constructor(private val repository: DataRepository) 
             repository.addItem(
                 TodoItem(
                     title = _editTitle.value,
-                    deadLine = _editDateTime.value.toLocalDateTime(),
+                    deadLine = LocalDateTime.of(_editDate.value,_editTime.value),
                     tag = _editTag.value,
                     text = _editText.value
                 )

@@ -1,6 +1,5 @@
 package com.nisilab.jetpacktodo
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,21 +9,20 @@ import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nisilab.jetpacktodo.di.viewmodel.EditViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.nisilab.jetpacktodo.ui.theme.JetpackTodoTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Composable
 fun EditScreen(
@@ -33,9 +31,16 @@ fun EditScreen(
 ) {
 
     val title by viewModel.editTitle.collectAsState()
-    val deadLine by viewModel.editDateTime.collectAsState()
+    val deadDate by viewModel.editDate.collectAsState()
+    val deadTime by viewModel.editTime.collectAsState()
     val tag by viewModel.editTag.collectAsState()
     val text by viewModel.editText.collectAsState()
+
+    val snackState = remember { SnackbarHostState() }
+    val snackScope = rememberCoroutineScope()
+
+    SnackbarHost(hostState = snackState, Modifier)
+
     val focusManager = LocalFocusManager.current
 
     Surface(modifier = Modifier
@@ -44,11 +49,6 @@ fun EditScreen(
             interactionSource = MutableInteractionSource(),
             indication = null,
         ) { focusManager.clearFocus() }) {
-
-        val snackState = remember { SnackbarHostState() }
-        val snackScope = rememberCoroutineScope()
-
-        SnackbarHost(hostState = snackState, Modifier)
 
         fun launchSnackBar() {
             snackScope.launch { snackState.showSnackbar("タイトルを入力してください") }
@@ -62,11 +62,13 @@ fun EditScreen(
                 launchSnackBar()
             }
         }
+
         Column(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             elmTextField(value = title, label = "title", changeValue = viewModel::setTitle)
+            deadLineField(date = deadDate, time = deadTime, changeDate = viewModel::setDate, changeTime = viewModel::setTime)
             elmTextField(value = tag, label = "tag", changeValue = viewModel::setTag)
             elmTextField(value = text, label = "text", changeValue = viewModel::setText)
             Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceAround) {
@@ -74,6 +76,7 @@ fun EditScreen(
                 saveButton(saveFlg = !title.isNullOrBlank(), action = ::saveButtonAction)
             }
         }
+
     }
 }
 
@@ -104,6 +107,24 @@ fun elmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
         }),
         singleLine = true
     )
+}
+
+@Composable
+fun deadLineField(date: LocalDate,time: LocalTime, changeDate: (LocalDate) -> Unit, changeTime: (LocalTime) -> Unit){
+    Row() {
+        elmDateField(value = date, changeValue = changeDate)
+        elmTimeField(value = time, changeValue = changeTime)
+    }
+}
+
+@Composable
+fun elmDateField(value: LocalDate, changeValue: (LocalDate) -> Unit){
+    Text(text = value.toString())
+}
+
+@Composable
+fun elmTimeField(value: LocalTime,changeValue: (LocalTime) -> Unit){
+    Text(text = value.toString())
 }
 
 @Composable
