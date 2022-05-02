@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     composable("edit") {
-                        EditScreen(viewModel = editViewModel, navController = navController) {
+                        EditScreen(viewModel = editViewModel) {
                             navController.navigate("list") {
                                 popUpTo("list") { inclusive = true }
                             }

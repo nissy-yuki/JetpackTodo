@@ -17,26 +17,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nisilab.jetpacktodo.di.viewmodel.EditViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.nisilab.jetpacktodo.ui.theme.JetpackTodoTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun EditScreen(
     viewModel: EditViewModel = viewModel(),
-    navController: NavController,
     toList: () -> Unit
 ) {
+
     val title by viewModel.editTitle.collectAsState()
     val deadLine by viewModel.editDateTime.collectAsState()
     val tag by viewModel.editTag.collectAsState()
     val text by viewModel.editText.collectAsState()
     val focusManager = LocalFocusManager.current
-
-
 
     Surface(modifier = Modifier
         .fillMaxSize()
@@ -49,8 +49,18 @@ fun EditScreen(
         val snackScope = rememberCoroutineScope()
 
         SnackbarHost(hostState = snackState, Modifier)
+
         fun launchSnackBar() {
             snackScope.launch { snackState.showSnackbar("タイトルを入力してください") }
+        }
+
+        fun saveButtonAction(flg: Boolean){
+            if (flg){
+                viewModel.saveTodo()
+                toList()
+            } else {
+                launchSnackBar()
+            }
         }
         Column(
             verticalArrangement = Arrangement.SpaceAround,
@@ -60,10 +70,8 @@ fun EditScreen(
             elmTextField(value = tag, label = "tag", changeValue = viewModel::setTag)
             elmTextField(value = text, label = "text", changeValue = viewModel::setText)
             Row(modifier = Modifier.fillMaxWidth(),horizontalArrangement = Arrangement.SpaceAround) {
-                backButton {
-                    toList()
-                }
-                saveButton(saveFlg = !title.isNullOrBlank(), toList = toList, saveAction = viewModel::saveTodo, showSnack = ::launchSnackBar)
+                backButton(action = toList)
+                saveButton(saveFlg = !title.isNullOrBlank(), action = ::saveButtonAction)
             }
         }
     }
@@ -72,6 +80,7 @@ fun EditScreen(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun elmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     val requester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
     OutlinedTextField(
@@ -90,6 +99,9 @@ fun elmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
             changeValue(it)
         },
         label = { Text(text = label ?: "") },
+        keyboardActions = KeyboardActions(onDone = {
+            keyboardController?.hide()
+        }),
         singleLine = true
     )
 }
@@ -102,14 +114,9 @@ fun backButton(action: () -> Unit) {
 }
 
 @Composable
-fun saveButton(saveFlg: Boolean,toList: () -> Unit,saveAction:() -> Unit,showSnack: () -> Unit) {
+fun saveButton(saveFlg: Boolean,action: (Boolean) -> Unit) {
     Button(onClick = {
-        if (saveFlg){
-            saveAction()
-            toList()
-        } else {
-            showSnack()
-        }
+        action(saveFlg)
     }) {
         Text(text = "save")
     }
