@@ -114,5 +114,3 @@ fun saveButton(saveFlg: Boolean,toList: () -> Unit,saveAction:() -> Unit,showSna
         Text(text = "save")
     }
 }
-
-@
