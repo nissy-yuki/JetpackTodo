@@ -167,25 +167,29 @@ fun showDatePicker(
 
 @Composable
 fun elmTimeField(value: LocalTime, changeValue: (LocalTime) -> Unit) {
-    Text(text = value.toString())
+    val context = LocalContext.current
+    Text(modifier = Modifier.clickable {
+        showTimePicker(context = context, onDecideDate = changeValue, value)
+    }, text = value.toString())
 }
 
-//fun showTimePicker(
-//    context: Context,
-//    onDecideDate: (LocalTime) -> Unit,
-//    time: LocalTime
-//) {
-//    val hour = time.hour
-//    val minute = time.minute
-//
-//    TimePickerDialog(
-//        context,
-//        { _: TimePicker, pickedHour: Int, pickedMinute: Int->
-//            onDecideDate(LocalTime.of(pickedHour, pickedMinute))
-//        }, hour, minute
-//    ).show()
-//
-//}
+fun showTimePicker(
+    context: Context,
+    onDecideDate: (LocalTime) -> Unit,
+    time: LocalTime
+) {
+    val hour = time.hour
+    val minute = time.minute
+
+    TimePickerDialog(
+        context,
+        { _, PickerHour: Int, PickerMinute: Int ->
+            onDecideDate(LocalTime.of(PickerHour, PickerMinute))
+        }, hour, minute, false
+    ).show()
+
+
+}
 
 @Composable
 fun backButton(action: () -> Unit) {
