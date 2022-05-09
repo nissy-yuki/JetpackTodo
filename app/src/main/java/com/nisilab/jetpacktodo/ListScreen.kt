@@ -9,79 +9,71 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nisilab.jetpacktodo.di.viewmodel.ListViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.nisilab.jetpacktodo.di.database.TodoItem
 import com.nisilab.jetpacktodo.di.viewmodel.OutItem
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 @Composable
 fun listScreen(viewModel: ListViewModel = viewModel(),toEdit: () -> Unit){
-    viewModel.setItems()
     val items by viewModel.outItems.collectAsState()
     Surface(modifier = Modifier.fillMaxSize()) {
-        items?.getOutList()?.also{
-            ListCompose(it)
+        items?.list?.also{
+            ListCompose(it,viewModel::updateTodoFinishFlg,viewModel::updateAllOutOpenFlg)
         } ?: run {
             noDataText()
         }
-        editButton { toEdit() }
+        toEditButton { toEdit() }
     }
 }
 
 @Composable
-fun ListCompose(outItems: List<OutItem>) {
-    LazyColumn(modifier = Modifier.fillMaxSize()){
+fun ListCompose(outItems: List<OutItem>,checkButtonAction:(Int) -> Unit,arrowButtonAction:(Int) -> Unit) {
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)){
         items(outItems){ toDo ->
-            listItem(toDo = toDo)
+            listItem(toDo = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
         }
     }
 }
 
-@Preview
 @Composable
-fun listItemTest() = listItem(toDo = TodoItem(title = "hoge", deadLine = ZonedDateTime.now().truncatedTo(
-    ChronoUnit.MINUTES).toLocalDateTime(), tag = "name", text = "huha").toOutItem())
-
-@Composable
-fun listItem(toDo: OutItem) {
+fun listItem(toDo: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit) {
     Card(shape = RoundedCornerShape(20.dp)) {
         Column(modifier = Modifier.clickable(enabled = true,
             interactionSource = remember { MutableInteractionSource() },
             indication = rememberRipple(bounded = false)
         ) {
-            toDo.changeOpenFlg()
+            arrowButtonAction(toDo.todo.id)
         }) {
-            itemHeadContents(item = toDo)
+            itemHeadContents(item = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
         }
     }
 }
 
 @Composable
-fun itemHeadContents(item: OutItem){
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
-        checkButton(checkFlg = item.todo.isFinish, action = { item.changeFinishFlg() })
-        headTextSet(title = item.todo.title, deadLine = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(item.todo.deadLine))
-        arrowButton(isOpen = item.isOpen, action = { item.changeOpenFlg() })
+fun itemHeadContents(item: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit){
+    Column() {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
+            checkButton(checkFlg = item.todo.isFinish, action = { checkButtonAction(item.todo.id) })
+            headTextSet(title = item.todo.title, deadLine = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(item.todo.deadLine))
+            arrowButton(isOpen = item.isOpen, action = { arrowButtonAction(item.todo.id) })
+        }
+        bodyItemSet(tag = item.todo.tag, text = item.todo.text)
+        
     }
+    
 }
 
 @Composable
@@ -114,7 +106,7 @@ fun headTextSet(title: String, deadLine: String){
 @Composable
 fun arrowButton(isOpen: Boolean, action: () -> Unit){
     Box(modifier = Modifier.fillMaxWidth(),contentAlignment = Alignment.BottomEnd) {
-        val iconImg = if (isOpen)Icons.Filled.ArrowDropDown else Icons.Filled.ArrowDropDown
+        val iconImg = if (isOpen)Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown
         Icon(iconImg, contentDescription = "Open", modifier = Modifier.clickable(
             enabled = true,
             interactionSource = remember { MutableInteractionSource() },
@@ -125,10 +117,45 @@ fun arrowButton(isOpen: Boolean, action: () -> Unit){
     }
 }
 
-
+@Composable
+fun bodyItemSet(tag: String?, text: String?){
+    Column {
+        Text(text = tag ?: "なし")
+        Text(text = text ?: "なし")
+        underButtonSet()
+    }
+}
 
 @Composable
-fun editButton(action: () -> Unit){
+fun underButtonSet(){
+    Row(modifier = Modifier.padding(start = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        itemEditButton {
+            Log.d("checkMove","push edit")
+        }
+        itemDeleteButton {
+            Log.d("checkMove","push delete")
+        }
+    }
+}
+
+@Composable
+fun itemEditButton(action: () -> Unit){
+    Row(modifier = Modifier.clickable { action() }) {
+        Icon(Icons.Filled.Edit, contentDescription = "editItem", tint = Color.Yellow)
+        Text(text = "Edit", color = Color.Yellow)
+    }
+}
+
+@Composable
+fun itemDeleteButton(action: () -> Unit){
+    Row(modifier = Modifier.clickable { action() }) {
+        Icon(Icons.Filled.Delete, contentDescription = "deleteItem", tint = Color.Red)
+        Text(text = "Delete", color = Color.Red)
+    }
+}
+
+@Composable
+fun toEditButton(action: () -> Unit){
     Box(contentAlignment = Alignment.BottomEnd) {
         FloatingActionButton(modifier = Modifier.padding(32.dp), onClick = { action() }) {
             Icon(Icons.Filled.Add, contentDescription = "add")
@@ -140,7 +167,7 @@ fun editButton(action: () -> Unit){
 fun noDataText(){
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,) {
+        horizontalAlignment = Alignment.CenterHorizontally) {
         Text(modifier = Modifier,text = "no data")
     }
 }

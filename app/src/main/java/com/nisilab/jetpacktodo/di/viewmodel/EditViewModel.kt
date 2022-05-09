@@ -57,8 +57,8 @@ class EditViewModel @Inject constructor(private val repository: DataRepository) 
                 TodoItem(
                     title = _editTitle.value,
                     deadLine = LocalDateTime.of(_editDate.value,_editTime.value),
-                    tag = _editTag.value,
-                    text = _editText.value
+                    tag = if(!_editTag.value.isNullOrBlank()) _editTag.value else null,
+                    text = if(!_editText.value.isNullOrBlank()) _editText.value else null
                 )
             )
         }

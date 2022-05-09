@@ -1,6 +1,5 @@
 package com.nisilab.jetpacktodo.di.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nisilab.jetpacktodo.di.repository.DataRepository
@@ -21,25 +20,31 @@ class ListViewModel @Inject constructor( private val repository: DataRepository)
     val outAllItems: StateFlow<OutList?> = _outAllItems
     val outItems: StateFlow<OutList?> = _outItems
 
-    fun setItems(){
+    init {
         viewModelScope.launch {
-            val items = repository.loadItems()
-            _todoItems.value = TodoList(items)
+            _todoItems.value = TodoList(repository.loadItems())
             _outAllItems.value = OutList(_todoItems.value.toOutItems())
-            _outItems.value = _outAllItems.value
+            setOutItems()
         }
     }
 
-    fun updateTodo(itemId: Int){
+    private fun setOutItems(){
+        _outItems.value = _outAllItems.value
+    }
+
+    fun updateTodoFinishFlg(itemId: Int){
         _todoItems.value = _todoItems.value.changeFinishFlg(itemId)
+        updateAllOutFinishFlg(itemId)
     }
 
-    fun updateAllOut(itemId: Int){
-        _outAllItems.value = _outAllItems.value.changeOpenFlg(itemId)
+    private fun updateAllOutFinishFlg(itemId: Int){
+        _outAllItems.value = _outAllItems.value.changeFinishFlg(itemId)
+        setOutItems()
     }
 
-    fun updateOut(itemId: Int){
+    fun updateAllOutOpenFlg(itemId: Int){
         _outAllItems.value = _outAllItems.value.changeOpenFlg(itemId)
+        setOutItems()
     }
 
 }

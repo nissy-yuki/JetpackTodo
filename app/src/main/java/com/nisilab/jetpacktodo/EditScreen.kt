@@ -132,7 +132,7 @@ fun deadLineField(
     changeDate: (LocalDate) -> Unit,
     changeTime: (LocalTime) -> Unit
 ) {
-    Row() {
+    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         elmDateField(value = date, changeValue = changeDate)
         elmTimeField(value = time, changeValue = changeTime)
     }
