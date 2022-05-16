@@ -10,7 +10,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -23,8 +27,6 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val listViewModel: ListViewModel by viewModels()
-    private val editViewModel: EditViewModel by viewModels()
 
     @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,21 +36,28 @@ class MainActivity : ComponentActivity() {
                 JetpackTodoTheme {
                     // A surface container using the 'background' color from the theme
                     val navController = rememberAnimatedNavController()
-                    NavHost(navController = navController, startDestination = "list") {
-                        composable("list") {
-                            listScreen() {
-                                navController.navigate(
-                                    "edit"
-                                )
-                            }
-                        }
-                        composable("edit") {
-                            EditScreen() {
-                                navController.popBackStack()
-                            }
-                        }
-                    }
+                    TodoNavHost(navController = navController)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun TodoNavHost(navController: NavHostController){
+    NavHost(navController = navController, startDestination = "list") {
+        composable("list") {
+            val viewModel = hiltViewModel<ListViewModel>()
+            listScreen(viewModel = viewModel) {
+                navController.navigate(
+                    "edit"
+                )
+            }
+        }
+        composable("edit") {
+            val viewModel = hiltViewModel<EditViewModel>()
+            EditScreen(viewModel = viewModel) {
+                navController.popBackStack()
             }
         }
     }
