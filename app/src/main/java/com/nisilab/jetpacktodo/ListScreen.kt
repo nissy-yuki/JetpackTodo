@@ -15,25 +15,39 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nisilab.jetpacktodo.di.viewmodel.ListViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.nisilab.jetpacktodo.di.database.TodoItem
 import com.nisilab.jetpacktodo.di.viewmodel.OutItem
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
 fun listScreen(viewModel: ListViewModel = viewModel(),toEdit: () -> Unit){
+    //viewModel.setItems()
     val items by viewModel.outItems.collectAsState()
     Surface(modifier = Modifier.fillMaxSize()) {
-        items?.list?.also{
-            ListCompose(it,viewModel::updateTodoFinishFlg,viewModel::updateAllOutOpenFlg)
-        } ?: run {
-            noDataText()
+        Column {
+            searchBox()
+            items?.also{
+                ListCompose(it,viewModel::updateTodoFinishFlg,viewModel::updateAllOutOpenFlg)
+            } ?: run {
+                noDataText()
+            }
         }
+
         toEditButton { toEdit() }
     }
 }
+
+@Composable
+fun searchBox(){
+
+}
+
 
 @Composable
 fun ListCompose(outItems: List<OutItem>,checkButtonAction:(Int) -> Unit,arrowButtonAction:(Int) -> Unit) {
@@ -46,13 +60,17 @@ fun ListCompose(outItems: List<OutItem>,checkButtonAction:(Int) -> Unit,arrowBut
     }
 }
 
+@Preview
+@Composable
+fun testListItem() = listItem(toDo = OutItem(todo = TodoItem(id = 0, title = "hogehogehogehgeoh", deadLine = LocalDateTime.now(), tag = null, text = "hahaha", isFinish = false), isOpen = true), checkButtonAction = { num -> Log.d("checkMove","push check")}, arrowButtonAction = { num -> Log.d("checkMove","push check")} )
+
 @Composable
 fun listItem(toDo: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit) {
     Card(shape = RoundedCornerShape(20.dp)) {
         Column(modifier = Modifier.clickable(enabled = true,
             interactionSource = remember { MutableInteractionSource() },
             indication = rememberRipple(bounded = false)
-        ) {
+        ){
             arrowButtonAction(toDo.todo.id)
         }) {
             itemHeadContents(item = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
@@ -65,13 +83,14 @@ fun itemHeadContents(item: OutItem, checkButtonAction: (Int) -> Unit, arrowButto
     Column() {
         Row(modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)) {
+            .padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             checkButton(checkFlg = item.todo.isFinish, action = { checkButtonAction(item.todo.id) })
             headTextSet(title = item.todo.title, deadLine = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(item.todo.deadLine))
             arrowButton(isOpen = item.isOpen, action = { arrowButtonAction(item.todo.id) })
         }
-        bodyItemSet(tag = item.todo.tag, text = item.todo.text)
-        
+        if(item.isOpen){
+            bodyItemSet(tag = item.todo.tag, text = item.todo.text)
+        }
     }
     
 }
@@ -91,13 +110,15 @@ fun checkButton(checkFlg: Boolean, action: () -> Unit){
             ) {
                 action()
             },
-        if (checkFlg)  Color.Green else Color.Gray
+        if(checkFlg) Color.Green else Color.Gray
     )
 }
 
 @Composable
 fun headTextSet(title: String, deadLine: String){
-    Column(modifier = Modifier.padding(top = 5.dp)) {
+    Column(modifier = Modifier
+        .fillMaxWidth(0.9f)
+        .padding(top = 5.dp)) {
         Text(text = deadLine, fontSize = 10.sp)
         Text(text = title, fontSize = 15.sp)
     }
@@ -105,7 +126,7 @@ fun headTextSet(title: String, deadLine: String){
 
 @Composable
 fun arrowButton(isOpen: Boolean, action: () -> Unit){
-    Box(modifier = Modifier.fillMaxWidth(),contentAlignment = Alignment.BottomEnd) {
+
         val iconImg = if (isOpen)Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown
         Icon(iconImg, contentDescription = "Open", modifier = Modifier.clickable(
             enabled = true,
@@ -114,12 +135,14 @@ fun arrowButton(isOpen: Boolean, action: () -> Unit){
         ) {
             action()
         })
-    }
+
 }
 
 @Composable
 fun bodyItemSet(tag: String?, text: String?){
-    Column {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 50.dp, bottom = 8.dp, end = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = tag ?: "なし")
         Text(text = text ?: "なし")
         underButtonSet()
@@ -128,7 +151,7 @@ fun bodyItemSet(tag: String?, text: String?){
 
 @Composable
 fun underButtonSet(){
-    Row(modifier = Modifier.padding(start = 16.dp, bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         itemEditButton {
             Log.d("checkMove","push edit")
         }
@@ -140,7 +163,7 @@ fun underButtonSet(){
 
 @Composable
 fun itemEditButton(action: () -> Unit){
-    Row(modifier = Modifier.clickable { action() }) {
+    Row(modifier = Modifier.clickable { action() }, verticalAlignment = Alignment.CenterVertically) {
         Icon(Icons.Filled.Edit, contentDescription = "editItem", tint = Color.Yellow)
         Text(text = "Edit", color = Color.Yellow)
     }
@@ -148,7 +171,7 @@ fun itemEditButton(action: () -> Unit){
 
 @Composable
 fun itemDeleteButton(action: () -> Unit){
-    Row(modifier = Modifier.clickable { action() }) {
+    Row(modifier = Modifier.clickable { action() }, verticalAlignment = Alignment.CenterVertically) {
         Icon(Icons.Filled.Delete, contentDescription = "deleteItem", tint = Color.Red)
         Text(text = "Delete", color = Color.Red)
     }

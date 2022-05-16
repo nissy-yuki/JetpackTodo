@@ -10,11 +10,9 @@ data class OutItem(
 ){
     fun changeOpenFlg(){
         this.isOpen = !this.isOpen
-        Log.d("checkValue","$isOpen")
     }
 
     fun changeFinishFlg(){
         this.todo.isFinish = !this.todo.isFinish
-        Log.d("checkValue","$todo")
     }
 }
