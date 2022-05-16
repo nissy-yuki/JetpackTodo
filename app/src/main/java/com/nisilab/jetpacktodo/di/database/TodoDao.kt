@@ -1,11 +1,12 @@
 package com.nisilab.jetpacktodo.di.database
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TodoDao {
-    @Query(("SELECT * FROM todo_table"))
-    fun loadAllItem(): List<TodoItem>
+    @Query("SELECT * FROM todo_table")
+    suspend fun loadAllItem(): List<TodoItem>
 
     @Insert
     suspend fun addItem(item: TodoItem)
