@@ -27,18 +27,17 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun ListScreen(viewModel: ListViewModel = viewModel(), toEdit: () -> Unit){
-    //viewModel.setItems()
+    viewModel.initFunc()
     val items by viewModel.outItems.collectAsState()
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
             SearchBox()
-            items?.also{
-                ListCompose(it,viewModel::updateTodoFinishFlg,viewModel::updateAllOutOpenFlg)
-            } ?: run {
+            if(items.isNotEmpty()){
+                ListCompose(items,viewModel::updateTodoFinishFlg,viewModel::updateOutItemOpenFlg)
+            } else {
                 NoDataText()
             }
         }
-
         ToEditButton { toEdit() }
     }
 }
@@ -50,43 +49,43 @@ fun SearchBox(){
 
 
 @Composable
-fun ListCompose(outItems: List<OutItem>, checkButtonAction:(Int) -> Unit, arrowButtonAction:(Int) -> Unit) {
+fun ListCompose(outItems: List<OutItem>, checkButtonAction:(OutItem) -> Unit, arrowButtonAction:(OutItem) -> Unit) {
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)){
         items(outItems){ toDo ->
-            ListItem(toDo = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
+            ListItem(item = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
         }
     }
 }
 
 @Preview
 @Composable
-fun TestListItem() = ListItem(toDo = OutItem(todo = TodoItem(id = 0, title = "hogehogehogehgeoh", deadLine = LocalDateTime.now(), tag = null, text = "hahaha", isFinish = false), isOpen = true), checkButtonAction = { num -> Log.d("checkMove","push check")}, arrowButtonAction = { num -> Log.d("checkMove","push check")} )
+fun TestListItem() = ListItem(item = OutItem(todo = TodoItem(id = 0, title = "hogehogehogehgeoh", deadLine = LocalDateTime.now(), tag = null, text = "hahaha", isFinish = false), isOpen = true), checkButtonAction = { num -> Log.d("checkMove","push check")}, arrowButtonAction = { num -> Log.d("checkMove","push check")} )
 
 @Composable
-fun ListItem(toDo: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit) {
+fun ListItem(item: OutItem, checkButtonAction: (OutItem) -> Unit, arrowButtonAction: (OutItem) -> Unit) {
     Card(shape = RoundedCornerShape(20.dp)) {
         Column(modifier = Modifier.clickable(enabled = true,
             interactionSource = remember { MutableInteractionSource() },
             indication = rememberRipple(bounded = false)
         ){
-            arrowButtonAction(toDo.todo.id)
+            arrowButtonAction(item)
         }) {
-            ItemHeadContents(item = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
+            ItemHeadContents(item = item, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
         }
     }
 }
 
 @Composable
-fun ItemHeadContents(item: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit){
+fun ItemHeadContents(item: OutItem, checkButtonAction: (OutItem) -> Unit, arrowButtonAction: (OutItem) -> Unit){
     Column() {
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            CheckButton(checkFlg = item.todo.isFinish, action = { checkButtonAction(item.todo.id) })
+            CheckButton(checkFlg = item.todo.isFinish, action = { checkButtonAction(item) })
             HeadTextSet(title = item.todo.title, deadLine = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(item.todo.deadLine))
-            ArrowButton(isOpen = item.isOpen, action = { arrowButtonAction(item.todo.id) })
+            ArrowButton(isOpen = item.isOpen, action = { arrowButtonAction(item) })
         }
         if(item.isOpen){
             BodyItemSet(tag = item.todo.tag, text = item.todo.text)

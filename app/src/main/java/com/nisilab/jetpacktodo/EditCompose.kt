@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -71,15 +72,15 @@ fun EditScreen(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ElmTextField(value = title, label = "title", changeValue = viewModel::setTitle)
+            elmTextField(value = title, label = "title", changeValue = viewModel::setTitle)
             DeadLineField(
                 date = deadDate,
                 time = deadTime,
                 changeDate = viewModel::setDate,
                 changeTime = viewModel::setTime
             )
-            ElmTextField(value = tag, label = "tag", changeValue = viewModel::setTag)
-            ElmTextField(value = text, label = "text", changeValue = viewModel::setText)
+            elmTextField(value = tag, label = "tag", changeValue = viewModel::setTag)
+            elmTextField(value = text, label = "text", changeValue = viewModel::setText)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
@@ -94,21 +95,24 @@ fun EditScreen(
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun ElmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
+fun elmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val requester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
+    fun onClick(state: FocusState) {
+        if (state.isFocused) {
+            coroutineScope.launch {
+                delay(200)
+                requester.bringIntoView()
+            }
+        }
+    }
     OutlinedTextField(
         modifier = Modifier
             .padding(16.dp)
             .bringIntoViewRequester(requester)
             .onFocusEvent { focusState ->
-                if (focusState.isFocused) {
-                    coroutineScope.launch {
-                        delay(200)
-                        requester.bringIntoView()
-                    }
-                }
+                onClick(focusState)
             }, value = value,
         onValueChange = {
             changeValue(it)

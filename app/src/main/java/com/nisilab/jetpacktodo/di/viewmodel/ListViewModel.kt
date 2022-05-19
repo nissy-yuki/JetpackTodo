@@ -1,10 +1,8 @@
 package com.nisilab.jetpacktodo.di.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nisilab.jetpacktodo.di.Model.OutItem
-import com.nisilab.jetpacktodo.di.Model.OutList
 import com.nisilab.jetpacktodo.di.Model.TodoList
 import com.nisilab.jetpacktodo.di.database.TodoItem
 import com.nisilab.jetpacktodo.di.repository.DataRepository
@@ -18,43 +16,49 @@ import javax.inject.Inject
 @HiltViewModel
 class ListViewModel @Inject constructor( private val repository: DataRepository) : ViewModel() {
 
-    private var _todoItems: TodoList = TodoList()
-    private var _outAllItems: OutList = OutList(_todoItems.toOutItems())
-    private val _outItems: MutableStateFlow<List<OutItem>> = MutableStateFlow(_outAllItems.list ?: emptyList())
+    private val _outItems: MutableStateFlow<List<OutItem>> = MutableStateFlow(emptyList())
 
     val outItems: StateFlow<List<OutItem>> = _outItems.asStateFlow()
 
-    init{
+    fun initFunc(){
         viewModelScope.launch {
-            _todoItems = TodoList(repository.loadItems())
-            _outAllItems = OutList(_todoItems.toOutItems())
-            setOutItems()
+            setOutItems(TodoList(repository.loadItems()).toOutItems())
         }
     }
 
-    private fun setOutItems(){
-        _outItems.value = _outAllItems.list
+    private fun setOutItems(list: List<OutItem>){
+        _outItems.value = list
     }
 
-    fun updateTodoFinishFlg(itemId: Int){
-        _todoItems.changeFinishFlg(itemId)
-        Log.d("checkValue","$_todoItems")
-        updateAllOutFinishFlg(itemId)
+    fun updateTodoFinishFlg(item:OutItem) {
+        val next = _outItems.value.toMutableList()
+        next[next.indexOf(item)].todo.isFinish = !item.todo.isFinish
+        setOutItems(next.toList())
+        updateDbItem(item.todo)
     }
 
-    private fun updateAllOutFinishFlg(itemId: Int){
-        _outAllItems.changeFinishFlg(itemId)
-        setOutItems()
+    fun updateOutItemOpenFlg(item: OutItem){
+        val next = _outItems.value.toMutableList()
+        next[next.indexOf(item)].isOpen = !item.isOpen
+        setOutItems(next.toList())
     }
 
-    fun updateAllOutOpenFlg(itemId: Int){
-        _outAllItems.changeOpenFlg(itemId)
-        setOutItems()
+    fun deleteItem(item: OutItem){
+        val next = _outItems.value.toMutableList()
+        next.remove(item)
+        setOutItems(next.toList())
+        deleteDbItem(item.todo)
     }
 
-    fun updateDbItem(item: TodoItem){
+    private fun updateDbItem(item: TodoItem){
         viewModelScope.launch {
             repository.updateItem(item)
+        }
+    }
+
+    private fun deleteDbItem(item: TodoItem){
+        viewModelScope.launch {
+            repository.deleteItem(item)
         }
     }
 }
