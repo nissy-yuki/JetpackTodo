@@ -3,9 +3,7 @@ package com.nisilab.jetpacktodo
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
-import android.util.Log
 import android.widget.DatePicker
-import android.widget.TimePicker
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,9 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
-import java.util.*
 
 @Composable
 fun EditScreen(
@@ -75,21 +71,21 @@ fun EditScreen(
             verticalArrangement = Arrangement.SpaceAround,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            elmTextField(value = title, label = "title", changeValue = viewModel::setTitle)
-            deadLineField(
+            ElmTextField(value = title, label = "title", changeValue = viewModel::setTitle)
+            DeadLineField(
                 date = deadDate,
                 time = deadTime,
                 changeDate = viewModel::setDate,
                 changeTime = viewModel::setTime
             )
-            elmTextField(value = tag, label = "tag", changeValue = viewModel::setTag)
-            elmTextField(value = text, label = "text", changeValue = viewModel::setText)
+            ElmTextField(value = tag, label = "tag", changeValue = viewModel::setTag)
+            ElmTextField(value = text, label = "text", changeValue = viewModel::setText)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
             ) {
-                backButton(action = toList)
-                saveButton(saveFlg = !title.isNullOrBlank(), action = ::saveButtonAction)
+                BackButton(action = toList)
+                SaveButton(saveFlg = title.isNotBlank(), action = ::saveButtonAction)
             }
         }
 
@@ -98,7 +94,7 @@ fun EditScreen(
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun elmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
+fun ElmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val requester = remember { BringIntoViewRequester() }
     val coroutineScope = rememberCoroutineScope()
@@ -126,20 +122,20 @@ fun elmTextField(value: String, label: String?, changeValue: (String) -> Unit) {
 }
 
 @Composable
-fun deadLineField(
+fun DeadLineField(
     date: LocalDate,
     time: LocalTime,
     changeDate: (LocalDate) -> Unit,
     changeTime: (LocalTime) -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        elmDateField(value = date, changeValue = changeDate)
-        elmTimeField(value = time, changeValue = changeTime)
+        ElmDateField(value = date, changeValue = changeDate)
+        ElmTimeField(value = time, changeValue = changeTime)
     }
 }
 
 @Composable
-fun elmDateField(value: LocalDate, changeValue: (LocalDate) -> Unit) {
+fun ElmDateField(value: LocalDate, changeValue: (LocalDate) -> Unit) {
     val context = LocalContext.current
 
     Text(modifier = Modifier.clickable {
@@ -166,7 +162,7 @@ fun showDatePicker(
 
 
 @Composable
-fun elmTimeField(value: LocalTime, changeValue: (LocalTime) -> Unit) {
+fun ElmTimeField(value: LocalTime, changeValue: (LocalTime) -> Unit) {
     val context = LocalContext.current
     Text(modifier = Modifier.clickable {
         showTimePicker(context = context, onDecideDate = changeValue, value)
@@ -192,14 +188,14 @@ fun showTimePicker(
 }
 
 @Composable
-fun backButton(action: () -> Unit) {
+fun BackButton(action: () -> Unit) {
     Button(onClick = { action() }) {
         Text(text = "back")
     }
 }
 
 @Composable
-fun saveButton(saveFlg: Boolean, action: (Boolean) -> Unit) {
+fun SaveButton(saveFlg: Boolean, action: (Boolean) -> Unit) {
     Button(onClick = {
         action(saveFlg)
     }) {
