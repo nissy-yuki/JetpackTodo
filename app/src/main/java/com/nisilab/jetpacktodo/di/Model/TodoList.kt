@@ -1,4 +1,4 @@
-package com.nisilab.jetpacktodo.di.viewmodel
+package com.nisilab.jetpacktodo.di.Model
 
 import com.nisilab.jetpacktodo.di.database.TodoItem
 

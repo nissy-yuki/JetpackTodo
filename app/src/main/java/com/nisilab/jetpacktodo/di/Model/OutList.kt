@@ -1,6 +1,4 @@
-package com.nisilab.jetpacktodo.di.viewmodel
-
-import android.util.Log
+package com.nisilab.jetpacktodo.di.Model
 
 data class OutList(
     val list: List<OutItem> = emptyList()

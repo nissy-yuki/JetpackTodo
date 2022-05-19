@@ -2,7 +2,7 @@ package com.nisilab.jetpacktodo.di.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.nisilab.jetpacktodo.di.viewmodel.OutItem
+import com.nisilab.jetpacktodo.di.Model.OutItem
 import java.io.Serializable
 import java.time.LocalDateTime
 
@@ -21,7 +21,7 @@ data class TodoItem(
         return this.copy(isFinish = !this.isFinish)
     }
 
-    fun toOutItem(): OutItem{
+    fun toOutItem(): OutItem {
         return OutItem(this)
     }
 }
