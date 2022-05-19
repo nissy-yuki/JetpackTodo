@@ -26,25 +26,25 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun listScreen(viewModel: ListViewModel = viewModel(),toEdit: () -> Unit){
+fun ListScreen(viewModel: ListViewModel = viewModel(), toEdit: () -> Unit){
     //viewModel.setItems()
     val items by viewModel.outItems.collectAsState()
     Surface(modifier = Modifier.fillMaxSize()) {
         Column {
-            searchBox()
+            SearchBox()
             items?.also{
                 ListCompose(it,viewModel::updateTodoFinishFlg,viewModel::updateAllOutOpenFlg)
             } ?: run {
-                noDataText()
+                NoDataText()
             }
         }
 
-        toEditButton { toEdit() }
+        ToEditButton { toEdit() }
     }
 }
 
 @Composable
-fun searchBox(){
+fun SearchBox(){
 
 }
 
@@ -55,17 +55,17 @@ fun ListCompose(outItems: List<OutItem>,checkButtonAction:(Int) -> Unit,arrowBut
         .fillMaxSize()
         .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)){
         items(outItems){ toDo ->
-            listItem(toDo = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
+            ListItem(toDo = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
         }
     }
 }
 
 @Preview
 @Composable
-fun testListItem() = listItem(toDo = OutItem(todo = TodoItem(id = 0, title = "hogehogehogehgeoh", deadLine = LocalDateTime.now(), tag = null, text = "hahaha", isFinish = false), isOpen = true), checkButtonAction = { num -> Log.d("checkMove","push check")}, arrowButtonAction = { num -> Log.d("checkMove","push check")} )
+fun TestListItem() = ListItem(toDo = OutItem(todo = TodoItem(id = 0, title = "hogehogehogehgeoh", deadLine = LocalDateTime.now(), tag = null, text = "hahaha", isFinish = false), isOpen = true), checkButtonAction = { num -> Log.d("checkMove","push check")}, arrowButtonAction = { num -> Log.d("checkMove","push check")} )
 
 @Composable
-fun listItem(toDo: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit) {
+fun ListItem(toDo: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit) {
     Card(shape = RoundedCornerShape(20.dp)) {
         Column(modifier = Modifier.clickable(enabled = true,
             interactionSource = remember { MutableInteractionSource() },
@@ -73,30 +73,30 @@ fun listItem(toDo: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction:
         ){
             arrowButtonAction(toDo.todo.id)
         }) {
-            itemHeadContents(item = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
+            ItemHeadContents(item = toDo, checkButtonAction = checkButtonAction, arrowButtonAction = arrowButtonAction)
         }
     }
 }
 
 @Composable
-fun itemHeadContents(item: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit){
+fun ItemHeadContents(item: OutItem, checkButtonAction: (Int) -> Unit, arrowButtonAction: (Int) -> Unit){
     Column() {
         Row(modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            checkButton(checkFlg = item.todo.isFinish, action = { checkButtonAction(item.todo.id) })
-            headTextSet(title = item.todo.title, deadLine = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(item.todo.deadLine))
-            arrowButton(isOpen = item.isOpen, action = { arrowButtonAction(item.todo.id) })
+            CheckButton(checkFlg = item.todo.isFinish, action = { checkButtonAction(item.todo.id) })
+            HeadTextSet(title = item.todo.title, deadLine = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").format(item.todo.deadLine))
+            ArrowButton(isOpen = item.isOpen, action = { arrowButtonAction(item.todo.id) })
         }
         if(item.isOpen){
-            bodyItemSet(tag = item.todo.tag, text = item.todo.text)
+            BodyItemSet(tag = item.todo.tag, text = item.todo.text)
         }
     }
     
 }
 
 @Composable
-fun checkButton(checkFlg: Boolean, action: () -> Unit){
+fun CheckButton(checkFlg: Boolean, action: () -> Unit){
     Icon(
         Icons.Filled.Check,
         contentDescription = "check",
@@ -115,7 +115,7 @@ fun checkButton(checkFlg: Boolean, action: () -> Unit){
 }
 
 @Composable
-fun headTextSet(title: String, deadLine: String){
+fun HeadTextSet(title: String, deadLine: String){
     Column(modifier = Modifier
         .fillMaxWidth(0.9f)
         .padding(top = 5.dp)) {
@@ -125,7 +125,7 @@ fun headTextSet(title: String, deadLine: String){
 }
 
 @Composable
-fun arrowButton(isOpen: Boolean, action: () -> Unit){
+fun ArrowButton(isOpen: Boolean, action: () -> Unit){
 
         val iconImg = if (isOpen)Icons.Filled.ArrowDropUp else Icons.Filled.ArrowDropDown
         Icon(iconImg, contentDescription = "Open", modifier = Modifier.clickable(
@@ -139,30 +139,30 @@ fun arrowButton(isOpen: Boolean, action: () -> Unit){
 }
 
 @Composable
-fun bodyItemSet(tag: String?, text: String?){
+fun BodyItemSet(tag: String?, text: String?){
     Column(modifier = Modifier
         .fillMaxWidth()
         .padding(start = 50.dp, bottom = 8.dp, end = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = tag ?: "なし")
         Text(text = text ?: "なし")
-        underButtonSet()
+        UnderButtonSet()
     }
 }
 
 @Composable
-fun underButtonSet(){
+fun UnderButtonSet(){
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        itemEditButton {
+        ItemEditButton {
             Log.d("checkMove","push edit")
         }
-        itemDeleteButton {
+        ItemDeleteButton {
             Log.d("checkMove","push delete")
         }
     }
 }
 
 @Composable
-fun itemEditButton(action: () -> Unit){
+fun ItemEditButton(action: () -> Unit){
     Row(modifier = Modifier.clickable { action() }, verticalAlignment = Alignment.CenterVertically) {
         Icon(Icons.Filled.Edit, contentDescription = "editItem", tint = Color.Yellow)
         Text(text = "Edit", color = Color.Yellow)
@@ -170,7 +170,7 @@ fun itemEditButton(action: () -> Unit){
 }
 
 @Composable
-fun itemDeleteButton(action: () -> Unit){
+fun ItemDeleteButton(action: () -> Unit){
     Row(modifier = Modifier.clickable { action() }, verticalAlignment = Alignment.CenterVertically) {
         Icon(Icons.Filled.Delete, contentDescription = "deleteItem", tint = Color.Red)
         Text(text = "Delete", color = Color.Red)
@@ -178,7 +178,7 @@ fun itemDeleteButton(action: () -> Unit){
 }
 
 @Composable
-fun toEditButton(action: () -> Unit){
+fun ToEditButton(action: () -> Unit){
     Box(contentAlignment = Alignment.BottomEnd) {
         FloatingActionButton(modifier = Modifier.padding(32.dp), onClick = { action() }) {
             Icon(Icons.Filled.Add, contentDescription = "add")
@@ -187,7 +187,7 @@ fun toEditButton(action: () -> Unit){
 }
 
 @Composable
-fun noDataText(){
+fun NoDataText(){
     Column(modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
