@@ -2,14 +2,20 @@ package com.nisilab.jetpacktodo.di.repository
 
 import com.nisilab.jetpacktodo.di.database.TodoDao
 import com.nisilab.jetpacktodo.di.database.TodoItem
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DataRepositoryImpl @Inject constructor(private val Dao: TodoDao) : DataRepository {
-    override suspend fun loadItems() = Dao.loadAllItem()
+    override fun loadItems() = Dao.loadAllItem()
 
-    override suspend fun addItem(item: TodoItem) = Dao.addItem(item)
+    override fun addItem(item: TodoItem) = Dao.addItem(item)
 
-    override suspend fun updateItem(item: TodoItem) = Dao.updateItem(item)
+    override fun updateItem(item: TodoItem) = Dao.updateItem(item)
 
-    override suspend fun deleteItem(item: TodoItem) = Dao.deleteItem(item)
+    override fun deleteItem(item: TodoItem) = Dao.deleteItem(item)
+
+    fun loadItemsSortByDeadLine() = loadItems().map {
+        it -> it.sortedBy { it.deadLine }
+    }
+
 }

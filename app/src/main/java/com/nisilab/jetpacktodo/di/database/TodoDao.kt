@@ -6,14 +6,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TodoDao {
     @Query("SELECT * FROM todo_table")
-    suspend fun loadAllItem(): List<TodoItem>
+    fun loadAllItem(): Flow<List<TodoItem>>
 
     @Insert
-    suspend fun addItem(item: TodoItem)
+    fun addItem(item: TodoItem)
 
     @Update
-    suspend fun updateItem(item: TodoItem)
+    fun updateItem(item: TodoItem)
 
     @Delete
-    suspend fun deleteItem(item: TodoItem)
+    fun deleteItem(item: TodoItem)
 }

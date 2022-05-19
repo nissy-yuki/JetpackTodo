@@ -1,10 +1,11 @@
 package com.nisilab.jetpacktodo.di.repository
 
 import com.nisilab.jetpacktodo.di.database.TodoItem
+import kotlinx.coroutines.flow.Flow
 
 interface DataRepository {
-    suspend fun loadItems(): List<TodoItem>
-    suspend fun addItem(item: TodoItem)
-    suspend fun updateItem(item: TodoItem)
-    suspend fun deleteItem(item: TodoItem)
+    fun loadItems(): Flow<List<TodoItem>>
+    fun addItem(item: TodoItem)
+    fun updateItem(item: TodoItem)
+    fun deleteItem(item: TodoItem)
 }
