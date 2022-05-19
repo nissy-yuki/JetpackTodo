@@ -3,13 +3,15 @@ package com.nisilab.jetpacktodo.di.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nisilab.jetpacktodo.di.Model.OutItem
+import com.nisilab.jetpacktodo.di.Model.OutList
+import com.nisilab.jetpacktodo.di.Model.TodoList
 import com.nisilab.jetpacktodo.di.database.TodoItem
 import com.nisilab.jetpacktodo.di.repository.DataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

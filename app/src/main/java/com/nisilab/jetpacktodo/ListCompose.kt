@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.nisilab.jetpacktodo.di.viewmodel.ListViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.nisilab.jetpacktodo.di.database.TodoItem
-import com.nisilab.jetpacktodo.di.viewmodel.OutItem
+import com.nisilab.jetpacktodo.di.Model.OutItem
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -50,7 +50,7 @@ fun SearchBox(){
 
 
 @Composable
-fun ListCompose(outItems: List<OutItem>,checkButtonAction:(Int) -> Unit,arrowButtonAction:(Int) -> Unit) {
+fun ListCompose(outItems: List<OutItem>, checkButtonAction:(Int) -> Unit, arrowButtonAction:(Int) -> Unit) {
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)){
